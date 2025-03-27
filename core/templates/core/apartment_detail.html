@@ -1,0 +1,80 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ apartment.block.name }} - {{ apartment.number }} - Apartman Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">{{ apartment.block.name }} - {{ apartment.number }}</h5>
+            {% if user.is_staff %}
+            <div>
+                <a href="{% url 'core:apartment_update' apartment.id %}" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Düzenle
+                </a>
+                <a href="{% url 'core:apartment_delete' apartment.id %}" class="btn btn-danger ms-2">
+                    <i class="bi bi-trash"></i> Sil
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6>Daire Bilgileri:</h6>
+                    <p><strong>Blok:</strong> {{ apartment.block.name }}</p>
+                    <p><strong>Daire No:</strong> {{ apartment.number }}</p>
+                    <p><strong>Daire Sahibi:</strong> {{ apartment.owner.get_full_name|default:apartment.owner.username }}</p>
+                    <p><strong>Durum:</strong> 
+                        {% if apartment.is_occupied %}
+                        <span class="badge bg-success">Dolu</span>
+                        {% else %}
+                        <span class="badge bg-danger">Boş</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h6>Aidat Geçmişi:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Tutar</th>
+                                    <th>Son Ödeme Tarihi</th>
+                                    <th>Durum</th>
+                                    <th>Ödeme Tarihi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for due in dues %}
+                                <tr>
+                                    <td>{{ due.due_date|date:"d.m.Y" }}</td>
+                                    <td>{{ due.amount }} TL</td>
+                                    <td>{{ due.due_date|date:"d.m.Y" }}</td>
+                                    <td>
+                                        {% if due.is_paid %}
+                                        <span class="badge bg-success">Ödendi</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Ödenmedi</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ due.payment_date|date:"d.m.Y"|default:"-" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Bu daireye ait aidat kaydı bulunmuyor.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

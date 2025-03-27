@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Apartman Yönetim Sistemi{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            background-color: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - 48px);
+            padding-top: .5rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .sidebar .nav-link {
+            font-weight: 500;
+            color: #333;
+            padding: 0.5rem 1rem;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #007bff;
+        }
+
+        .sidebar .nav-link.active {
+            color: #007bff;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 8px;
+        }
+
+        #sidebarToggle {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 101;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -240px;
+            }
+            .sidebar.active {
+                margin-left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .main-content.active {
+                margin-left: 240px;
+            }
+        }
+
+        .user-info {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, .1);
+        }
+
+        .flower-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .flower {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            animation: fall linear forwards;
+        }
+
+        .flower::before,
+        .flower::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 182, 193, 0.7);
+            border-radius: 50px 0;
+        }
+
+        .flower::before {
+            width: 15px;
+            height: 15px;
+            transform: rotate(45deg);
+        }
+
+        .flower::after {
+            width: 15px;
+            height: 15px;
+            transform: rotate(-45deg);
+        }
+
+        .flower span {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: rgba(255, 182, 193, 0.7);
+            border-radius: 50px 0;
+            transform: rotate(90deg);
+        }
+
+        .flower span::before {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: rgba(255, 182, 193, 0.7);
+            border-radius: 50px 0;
+            transform: rotate(90deg);
+        }
+
+        .flower-center {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 223, 186, 0.9);
+            border-radius: 50%;
+            top: 5px;
+            left: 5px;
+            z-index: 2;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0.7;
+            }
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ECE3DA;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #FCF8F3;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+            background-color: #FFFFFF;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(148, 180, 159, 0.1);
+        }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        .btn-primary {
+            background-color: #94B49F;
+            border-color: #94B49F;
+            box-shadow: 0 2px 4px rgba(148, 180, 159, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: #789F8A;
+            border-color: #789F8A;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-primary {
+            color: #94B49F;
+            border-color: #94B49F;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #94B49F;
+            border-color: #94B49F;
+            color: #fff;
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background-color: #FCF8F3;
+            border-bottom: 2px solid #ECE3DA;
+            color: #94B49F;
+            font-weight: 600;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #94B49F 0%, #789F8A 100%);
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(148, 180, 159, 0.15);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            padding: 1rem 1.5rem;
+            border-radius: 0.35rem;
+            margin: 0.2rem 1rem;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            margin: 1rem;
+            border-radius: 0.35rem;
+            border: none;
+        }
+
+        .main-content {
+            background-color: #FFFFFF;
+        }
+
+        .bg-primary {
+            background-color: #94B49F !important;
+        }
+
+        .text-primary {
+            color: #94B49F !important;
+        }
+
+        .badge.bg-primary {
+            background-color: #E8F3EA !important;
+            color: #94B49F;
+        }
+
+        .icon-circle.bg-primary {
+            background-color: #E8F3EA;
+            color: #94B49F;
+        }
+
+        .icon-circle.bg-warning {
+            background-color: #FCF8F3;
+            color: #CEA07E;
+        }
+
+        .icon-circle.bg-success {
+            background-color: #EDF7ED;
+            color: #76A878;
+        }
+
+        .alert-success {
+            background-color: #EDF7ED;
+            color: #76A878;
+        }
+
+        .alert-warning {
+            background-color: #FCF8F3;
+            color: #CEA07E;
+        }
+
+        .alert-danger {
+            background-color: #FDF1F1;
+            color: #D88E8E;
+        }
+
+        .alert-info {
+            background-color: #F3F8FC;
+            color: #7EA5CE;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="flower-container"></div>
+    <button class="btn btn-primary d-md-none" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <div class="sidebar" style="width: 240px;">
+        <div class="user-info">
+            {% if user.is_authenticated %}
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-person-circle fs-4 me-2"></i>
+                    <div>
+                        <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                        <small class="text-white-50">{{ user.email }}</small>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'core:home' %}">
+                        <i class="bi bi-house"></i>
+                        Ana Sayfa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'blocks' in request.path %}active{% endif %}" href="{% url 'core:block_list' %}">
+                        <i class="bi bi-building"></i>
+                        Bloklar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'apartments' in request.path %}active{% endif %}" href="{% url 'core:apartment_list' %}">
+                        <i class="bi bi-house"></i>
+                        Daireler
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'dues' in request.path %}active{% endif %}" href="{% url 'core:dues_list' %}">
+                        <i class="bi bi-cash"></i>
+                        Aidatlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'expenses' in request.path %}active{% endif %}" href="{% url 'core:expense_list' %}">
+                        <i class="bi bi-receipt"></i>
+                        Harcamalar
+                    </a>
+                </li>
+                {% if user.is_staff %}
+                <li class="nav-item mt-3">
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-plus-circle"></i> Yeni Ekle
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'core:apartment_create' %}">
+                                <i class="bi bi-house"></i> Yeni Daire
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'core:dues_create' %}">
+                                <i class="bi bi-cash"></i> Yeni Aidat
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'core:expense_create' %}">
+                                <i class="bi bi-receipt"></i> Yeni Harcama
+                            </a></li>
+                        </ul>
+                    </div>
+                </li>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <li class="nav-item mt-3">
+                    <a class="nav-link text-danger" href="{% url 'core:logout' %}">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Çıkış
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item mt-3">
+                    <a class="nav-link" href="{% url 'login' %}">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Giriş
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <a href="javascript:history.back()" class="back-button" title="Geri Dön">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+
+    <main class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.main-content').classList.toggle('active');
+        });
+
+        // Çiçek yağmuru animasyonu
+        function createFlower() {
+            const container = document.querySelector('.flower-container');
+            const flower = document.createElement('div');
+            const span = document.createElement('span');
+            const center = document.createElement('div');
+            
+            const size = Math.random() * 10 + 10; // 10px ile 20px arası
+            const left = Math.random() * 100;
+            const animationDuration = Math.random() * 8 + 7; // 7-15 saniye arası
+            
+            flower.className = 'flower';
+            span.className = 'flower-span';
+            center.className = 'flower-center';
+            
+            flower.style.width = `${size}px`;
+            flower.style.height = `${size}px`;
+            flower.style.left = `${left}%`;
+            flower.style.animationDuration = `${animationDuration}s`;
+            
+            flower.appendChild(span);
+            flower.appendChild(center);
+            container.appendChild(flower);
+            
+            flower.addEventListener('animationend', () => {
+                flower.remove();
+            });
+        }
+
+        setInterval(createFlower, 1000); // Her saniyede bir çiçek oluştur
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

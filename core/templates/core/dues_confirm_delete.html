@@ -1,0 +1,9 @@
+{% extends 'core/confirm_delete_base.html' %}
+
+{% block title %}Aidat Sil{% endblock %}
+
+{% block content %}
+{% with title="Aidat Sil" message="Bu aidat kaydını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz." cancel_url='core:dues_list' %}
+    {{ block.super }}
+{% endwith %}
+{% endblock %} 

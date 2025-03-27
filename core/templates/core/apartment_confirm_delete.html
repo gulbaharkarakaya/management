@@ -1,0 +1,9 @@
+{% extends 'core/confirm_delete_base.html' %}
+
+{% block title %}Daire Sil{% endblock %}
+
+{% block content %}
+{% with title="Daire Sil" message="Bu daireyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz." cancel_url=apartment.get_absolute_url %}
+    {{ block.super }}
+{% endwith %}
+{% endblock %} 

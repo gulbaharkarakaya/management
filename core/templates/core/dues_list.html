@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Aidatlar - Apartman Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Aidatlar</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Daire</th>
+                            <th>Tutar</th>
+                            <th>Son Ödeme Tarihi</th>
+                            <th>Durum</th>
+                            <th>Ödeme Tarihi</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for due in dues %}
+                        <tr>
+                            <td>{{ due.apartment.block.name }} - {{ due.apartment.number }}</td>
+                            <td>{{ due.amount }} TL</td>
+                            <td>{{ due.due_date|date:"d.m.Y" }}</td>
+                            <td>
+                                {% if due.is_paid %}
+                                <span class="badge bg-success">Ödendi</span>
+                                {% else %}
+                                <span class="badge bg-danger">Ödenmedi</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ due.payment_date|date:"d.m.Y"|default:"-" }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    {% if user.is_staff %}
+                                    <a href="{% url 'core:dues_update' due.id %}" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'core:dues_delete' due.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Henüz aidat eklenmemiş.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

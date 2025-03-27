@@ -1,0 +1,9 @@
+{% extends 'core/confirm_delete_base.html' %}
+
+{% block title %}Harcama Sil{% endblock %}
+
+{% block content %}
+{% with title="Harcama Sil" message="Bu harcama kaydını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz." cancel_url='core:expense_list' %}
+    {{ block.super }}
+{% endwith %}
+{% endblock %} 
